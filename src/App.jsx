@@ -131,11 +131,28 @@ function App() {
               {movies.map((movie) => (
                 <div className="col-md-4" key={movie.id}>
                   <div className="card border-0 mb-4 position-relative position-relative">
-                    <img
-                      src={`https://image.tmdb.org/t/p/original/${movie.poster_path}`}
-                      className="card-img-top rounded-0"
-                      alt={movie.title}
-                    />
+                    <div
+                      style={{
+                        width: "100%",
+                        aspectRatio: "2/3", // 海報常見比例
+                        overflow: "hidden",
+                      }}
+                    >
+                      <img
+                        src={
+                          movie.poster_path
+                            ? `https://image.tmdb.org/t/p/original/${movie.poster_path}`
+                            : "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png"
+                        }
+                        className="card-img-top rounded-0"
+                        alt={movie.title}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    </div>
 
                     <div className="card-body p-0">
                       <h4 className="mb-0 mt-3">
