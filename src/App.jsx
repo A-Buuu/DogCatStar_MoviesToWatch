@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-
+import { ClipLoader } from "react-spinners";
 
 function App() {
+  const [isScreenLoading, setIsScreenLoading] = useState(false);
   const [movies, setMovies] = useState([]);
   const sortBy = [
     { title: "熱門 (預設)", api_value: "popularity" },
@@ -22,6 +23,7 @@ function App() {
   });
   // 取得電影列表
   const getMovies = async (page = 1) => {
+    setIsScreenLoading(true);
     try {
       const res = await tmdbAPI.get("/discover/movie", {
         params: {
@@ -38,6 +40,8 @@ function App() {
     } catch (error) {
       // alert("取得電影列表失敗");
       console.log("Fail: ", error.response.data.status_message);
+    } finally {
+      setIsScreenLoading(false);
     }
   };
   // 取得電影列表(預設排序: 熱門)
@@ -59,6 +63,7 @@ function App() {
   const searchMovie = async () => {
     if(search === "")
       return;
+    setIsScreenLoading(true);
     try {
       const res = await tmdbAPI.get("/search/movie", {
         params: {
@@ -71,10 +76,12 @@ function App() {
       });
       console.log("搜尋: ", res);
       setMovies(res.data.results);
-      setSearch('');
+      setSearch("");
     } catch (error) {
       // alert("搜尋失敗");
       console.log("Fail: ", error.response.data.status_message);
+    } finally {
+      setIsScreenLoading(false);
     }
   }
 
@@ -272,6 +279,25 @@ function App() {
           </div>
         </div>
       </div>
+      {/* 滿版 Loading */}
+      {isScreenLoading && (
+        <div
+          className="d-flex justify-content-center align-items-center"
+          style={{
+            position: "fixed",
+            inset: 0,
+            backgroundColor: "rgba(255, 255, 255, 0.7)",
+            zIndex: 999,
+          }}
+        >
+          <ClipLoader
+            color="black"
+            size={50}
+            aria-label="Loading Spinner"
+            cssOverride={{ borderWidth: "5px" }}
+          />
+        </div>
+      )}
     </div>
   );
 }
