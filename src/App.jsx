@@ -11,6 +11,7 @@ function App() {
     { title: "上映時間", api_value: "primary_release_date" },
   ];
   const [selectedSort, setSelectedSort] = useState("popularity");
+  const [search, setSearch] = useState("");
   //預設 header 的 instance
   const tmdbAPI = axios.create({
     baseURL: import.meta.env.VITE_TMDB_API_BASE,
@@ -43,6 +44,40 @@ function App() {
   useEffect(() => {
     getMovies();
   }, [selectedSort]);
+
+  // 搜尋電影
+  const handleInputChange = (e) => {
+    const { value } = e.target;
+    setSearch(value);
+    // console.log("Input: ", value);
+  };
+  const handleInputKeyDown = (e) => {
+    const { key } = e;
+    if (key === 'Enter')
+      searchMovie();
+  };
+  const searchMovie = async () => {
+    if(search === "")
+      return;
+    try {
+      const res = await tmdbAPI.get("/search/movie", {
+        params: {
+          query: search,
+          include_adult: false,
+          include_video: false,
+          language: "en-US",
+          page: 1,
+        },
+      });
+      console.log("搜尋: ", res);
+      setMovies(res.data.results);
+      setSearch('');
+    } catch (error) {
+      // alert("搜尋失敗");
+      console.log("Fail: ", error.response.data.status_message);
+    }
+  }
+
   // 頁面處理
   const [pageInfo, setPageInfo] = useState({});
   const handlePageChange = (page) => {
@@ -68,6 +103,7 @@ function App() {
               "url(https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)",
             backgroundPosition: "center center",
             opacity: 0.3,
+            pointerEvents: "none",
           }}
         ></div>
         <div className="d-flex flex-column">
@@ -75,6 +111,28 @@ function App() {
           <h4 className="fw-bold">
             Millions of movies, TV shows and people to discover. Explore now.
           </h4>
+          <div className="d-flex">
+            <input
+              value={search}
+              id="search"
+              type="text"
+              className="form-control"
+              placeholder="Search for a movie..."
+              name="search"
+              onChange={handleInputChange}
+              onKeyDown={handleInputKeyDown}
+            />
+            <button
+              type="button"
+              className="btn"
+              style={{
+                border: "none",
+              }}
+              onClick={searchMovie}
+            >
+              <i className="fas fa-search"></i>
+            </button>
+          </div>
         </div>
       </div>
 
